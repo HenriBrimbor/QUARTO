@@ -14,7 +14,7 @@ def QUARTO():
         IA = recherche_gagne(Jeu.Pièces[n], Jeu.PLATEAU)                   #recherche où placer la pèce pour gagner le jeu
         if IA != False:
             Jeu.PLATEAU[IA[0]][IA[1]] = Jeu.Pièces[n]
-            for k in range(4):
+            for k in range(4):                                              # TEST
                 print(Jeu.PLATEAU[k])
             return ("l'IA place la pièce", Jeu.Pièces[n], "à la place", IA, "QUARTO!!")
 
