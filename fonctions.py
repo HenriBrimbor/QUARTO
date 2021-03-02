@@ -1,66 +1,73 @@
 from math import *
 from random import *
-import matplotlib.pyplot as plt
 from copy import copy
+
 def pieces():
-     """
-     taille_forme_couleur_creux
-     """
-     L=[('petit','carré','blanc','plein'),('petit','carré','blanc','creux'),('petit','carré','noir','plein'),('petit','carré','noir','creux'),('petit','rond','noir','plein'),('petit','rond','noir','creux'),('petit','rond','blanc','plein'),('petit','rond','blanc','creux'),('grand','carré','blanc','plein'),('grand','carré','blanc','creux'),('grand','carré','noir','plein'),('grand','carré','noir','creux'),('grand','rond','noir','plein'),('grand','rond','noir','creux'),('grand','rond','blanc','plein'),('grand','rond','blanc','creux')]
-     return L
+    pieces = []
+    for size in range(2):
+        for form in range(2):
+            for color in range(2):
+                for hollow in range(2):
+                    pieces.append( Piece(size, form, color, hollow) )
+    return pieces
 
 def Copie_Plateau(Plateau):
     return [copy(Plateau[0]), copy(Plateau[1]), copy(Plateau[2]), copy(Plateau[3])]
 
-def recherche_gagne(pièce,PLATEAU):
+def recherche_gagne(piece, board):
     """
-    foncton qui recherche où placer la pièce pour gagner en 1 coup
+    foncton qui recherche où placer la piece pour gagner en 1 coup
     """
+    caracteristics = ['size', 'form', 'color', 'hollow']
     for i in range(4):
         for j in range(4):
-            P2 = Copie_Plateau(PLATEAU)
-            if P2[i][j]==0:
-                P2[i][j]=pièce
-                for l in range(4):                  #pour les 4 paramètres
-                    S=[]
-                    for o in range(4):              #reparcours la matrice en diagonnale
-                        if P2[o][o]!=0:             #évite l'erreur 'int' object is not subscriptable
-                            if P2[o][o][l]==pièce[l]:
-                                S.append(1)
-                    if S==[1,1,1,1]:
+            P2 = Copie_Plateau(board)
+            if P2[i][j] == 0:
+                P2[i][j] = piece
+                for car in range(4):
+                    S = 0
+                    for o in range(4):
+                        if P2[o][o] != 0: #évite l'erreur 'int' object is not subscriptable
+                            if P2[o][o].__show__()[car]:
+                                S += 1
+                        if S == 4 or S == 0:
+                            return (i,j)
+                    S = 0
+                    for o in range(4):  #reparcours la matrice en diagonnale
+                        if P2[o][3-o]!=0:
+                            if P2[k][3-o].__show__()[car]:
+                                S += 1
+                        if S == 4 or S == 0:
+                            return (i,j)
+                    S = 0
+                    for p in range(4): #reparcours la matrice en ligne
+                        if P2[p][j] != 0:
+                            if P2[p][j].__show__()[car]:
+                                S += 1
+                    if S == 4 or S == 0:
                         return (i,j)
-                    S=[]
-                    for k in range(4):              #reparcours la matrice en diagonnale
-                        if P2[k][3-k]!=0:
-                            if P2[k][3-k][l]==pièce[l]:
-                                S.append(1)
-                    if S==[1,1,1,1]:
-                        return (i,j)
-                    S=[]
-                    for p in range(4):               #reparcours la matrice en ligne
-                        if P2[p][j]!=0:
-                            if P2[p][j][l]==pièce[l]:
-                                S.append(1)
-                    if S==[1,1,1,1]:
-                        return (i,j)
-                    S=[]
-                    for m in range(4):               #reparcours la matrice en colonnes
-                        if P2[i][m]!=0:
-                            if P2[i][m][l]==pièce[l]:
-                                S.append(1)
-                    if S==[1,1,1,1]:
+                    S = 0
+                    for m in range(4):  #reparcours la matrice en colonnes
+                        if P2[i][m] != 0:
+                            if P2[i][m].__show__()[car]:
+                                S += 1
+                    if S == 4 or S == 0:
                         return (i,j)
     return False
 
-def recherche_inverse(Pièces,plateau):
+def recherche_inverse(pieces,plateau):
     """
     fonction qui renvoie toutes les pièces possibles à donner quand la pièce obtenue est déja placée
+    donc toutes les pièces qui ne font pas gagner l'adversaire
     """
     P=[]
-    for t in range(len(Pièces)):
-        if recherche_gagne(Pièces[t],plateau)==False:
-            P.append(Pièces[t])
-    return P
+    for piece in range(len(pieces)):
+        if recherche_gagne(pieces[piece],plateau) == False:
+            P.append(pieces[piece])
+    if len(P) !=0:
+        return P
+    else:
+        return pieces[randint(0,len(pieces)-1)]
 
 def plateau_plein(plateau):
     """
@@ -72,15 +79,15 @@ def plateau_plein(plateau):
                 return False
     return True
 
-def etat_du_jeu(plateau,pièces):
+def etat_du_jeu(plateau, pièces):
         for k in range(10):
-            print(".")
+            print(" ")
         for k in range(4):
             print(plateau[k])
         for k in range(len(pièces)):
-            print(pièces[k],k)
+            print(pièces[k].__showcar__(),k)
 
-def demande_au_joueur( plateau):
+def demande_au_joueur( plateau ):
         i = int(input("sur quelle ligne voulez vous placer cette pièce?"))
         j = int(input("sur quelle colonne voulez vous placer cette pièce?"))
         while i>3 or j>3 or plateau[i][j] != 0:
@@ -137,11 +144,6 @@ def nombre_de_places(plateau):
             if plateau[i][j]==0:
                 compteur+=1
     return compteur
-class Pieces():
-    taille = ''
-    forme = ''
-    couleur = ''
-
 
 def recherche_victoire_simple(a, b, Plateau):
     """
